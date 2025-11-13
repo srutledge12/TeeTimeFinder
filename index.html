@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Golf Tee Time Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Find Golf Tee Times</h1>
+    <p class="subtitle">Search nearby courses by preferred time</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <form id="search-form" novalidate>
+        <div class="grid">
+          <div class="field">
+            <label for="zipCode">Zip code</label>
+            <input
+              id="zipCode"
+              name="zipCode"
+              type="text"
+              inputmode="numeric"
+              pattern="^[0-9]{5}$"
+              placeholder="84106"
+              required
+            />
+            <small class="hint">5-digit US ZIP (required)</small>
+          </div>
+
+          <div class="field">
+            <label for="date">Date</label>
+            <input
+              id="date"
+              name="date"
+              type="date"
+              required
+            />
+            <small class="hint">Cannot be in the past</small>
+          </div>
+
+          <div class="field">
+            <label for="preferredTime">Preferred time</label>
+            <input
+              id="preferredTime"
+              name="preferredTime"
+              type="time"
+              step="60"
+              required
+            />
+            <small class="hint">e.g., 12:00 PM</small>
+          </div>
+
+          <div class="field">
+            <label for="timeRange">Flexibility window</label>
+            <div class="range-wrap">
+              <input
+                id="timeRange"
+                name="timeRange"
+                type="range"
+                min="0"
+                max="4"
+                step="0.5"
+              />
+              <output id="timeRangeOutput" for="timeRange">±1 hr</output>
+            </div>
+            <small class="hint">Search window around preferred time</small>
+          </div>
+
+          <div class="field">
+            <label for="groupSize">Group size</label>
+            <input
+              id="groupSize"
+              name="groupSize"
+              type="number"
+              min="1"
+              max="4"
+              step="1"
+              required
+            />
+            <small class="hint">1–4 players</small>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" id="searchBtn" class="btn primary">Search</button>
+        </div>
+      </form>
+      <div id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="results" class="results-grid" aria-live="polite"></section>
+  </main>
+
+  <script defer src="./app.js"></script>
+</body>
+</html>
