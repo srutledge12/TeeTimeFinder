@@ -67,7 +67,7 @@ html, body {
 @media (min-width: 920px) {
   .field { grid-column: span 2; }
 }
-label {
+label, .label {
   font-size: 0.92rem;
 }
 input[type="text"],
@@ -90,6 +90,26 @@ input:focus {
 .hint {
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+/* New: holes radio group */
+.holes-field .radio-group {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #243457;
+  background: #0e1630;
+  color: var(--text);
+  border-radius: 10px;
+}
+.radio input[type="radio"] {
+  accent-color: #2b8cff;
 }
 
 .range-wrap {

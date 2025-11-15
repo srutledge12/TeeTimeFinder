@@ -5,7 +5,7 @@ const BASE_URL = "https://getcourseavailability.azurewebsites.net/api";
 const API_CODE = "r5KdTmvZoTt1gd7SiV6MYKKeCj8TIia8jU2F4oFud1NSAzFu0Y6jZw==";
 const CORS_PROXY = "https://corsproxy.io/?";
 
-async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
+async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize, holes) {
   try {
     // Step 1: Get courses
     const coursesResponse = await fetch(`${BASE_URL}/get_courses?zip_code=${zipCode}&code=${API_CODE}`);
@@ -16,6 +16,7 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
 
     // Step 2: Fetch tee times for all courses
     const combinedBody = [];
+
     for (const course of courses) {
       try {
         const combinedCourseTeeTime = [];
@@ -41,7 +42,7 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
         }
 
         if (combinedCourseTeeTime.length > 0) {
-          combinedBody.push({
+          const payload = {
             tee_times: combinedCourseTeeTime,
             preferred_time: preferredTime,
             time_range: timeRange,
@@ -49,7 +50,12 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
             course_name: course.name,
             course_slug: course.slug,
             date: date
-          });
+          };
+          // Only include holes if it’s 9 or 18
+          if (holes === 9 || holes === 18) {
+            payload.holes = holes;
+          }
+          combinedBody.push(payload);
         }
       } catch (error) {
         console.error(`Failed to fetch tee times for course '${course.name}': ${error.message}`);
@@ -85,7 +91,8 @@ const els = {
   group: document.getElementById('groupSize'),
   status: document.getElementById('status'),
   results: document.getElementById('results'),
-  searchBtn: document.getElementById('searchBtn')
+  searchBtn: document.getElementById('searchBtn'),
+  holesRadios: document.querySelectorAll('input[name="holes"]')
 };
 
 function setDefaultValues() {
@@ -130,7 +137,6 @@ function setLoading(loading, message = '') {
   els.status.classList.toggle('error', false);
 
   if (loading) {
-    // Clear and add spinner + text
     els.status.innerHTML = '';
     const spinner = document.createElement('span');
     spinner.className = 'spinner';
@@ -139,7 +145,6 @@ function setLoading(loading, message = '') {
     text.textContent = message || 'Searching tee times...';
     els.status.appendChild(spinner);
     els.status.appendChild(text);
-
     renderSkeletons();
   } else {
     els.status.textContent = message || '';
@@ -164,7 +169,6 @@ function renderSkeletons(count = 6) {
   }
 }
 
-// Helper to get minimum tee time price per course
 function getMinTeeTimePrice(course) {
   if (!course || !Array.isArray(course.tee_times)) return null;
   const prices = course.tee_times
@@ -182,7 +186,6 @@ function renderResults(courses) {
     return;
   }
 
-  // Sort by lowest tee-time price, then by number of tee times
   courses.sort((a, b) => {
     const minA = getMinTeeTimePrice(a);
     const minB = getMinTeeTimePrice(b);
@@ -287,10 +290,12 @@ async function onSubmit(e) {
   const preferredTime = els.time.value;
   const timeRange = parseFloat(els.range.value);
   const groupSize = parseInt(els.group.value, 10);
+  const holesEl = document.querySelector('input[name="holes"]:checked');
+  const holes = holesEl ? parseInt(holesEl.value, 10) : undefined;
 
   setLoading(true, 'Searching tee times...');
   try {
-    const result = await getTeeTime(zip, date, preferredTime, timeRange, groupSize);
+    const result = await getTeeTime(zip, date, preferredTime, timeRange, groupSize, holes);
     setLoading(false);
     if (result && !result.error) {
       renderResults(result);
