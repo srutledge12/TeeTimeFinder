@@ -7,17 +7,20 @@ const CORS_PROXY = "https://corsproxy.io/?";
 
 async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
   try {
+    // Step 1: Get courses
     const coursesResponse = await fetch(`${BASE_URL}/get_courses?zip_code=${zipCode}&code=${API_CODE}`);
     if (!coursesResponse.ok) throw new Error(`Failed to fetch courses: ${coursesResponse.status}`);
 
     const courses = await coursesResponse.json();
     if (!courses || courses.length === 0) return { error: "No courses found." };
 
+    // Step 2: Fetch tee times for all courses
     const combinedBody = [];
     for (const course of courses) {
       try {
         const combinedCourseTeeTime = [];
         let page = 1;
+
         while (true) {
           const chronoUrl = "https://www.chronogolf.com/marketplace/v2/teetimes";
           const params = new URLSearchParams({
@@ -25,11 +28,12 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
             course_ids: course.uuid,
             page: page.toString()
           });
+
           const response = await fetch(`${CORS_PROXY}${chronoUrl}?${params}`);
           if (!response.ok) throw new Error(`API call failed with status ${response.status}`);
 
           const data = await response.json();
-            const teeTimes = data.teetimes || [];
+          const teeTimes = data.teetimes || [];
           if (teeTimes.length === 0) break;
 
           combinedCourseTeeTime.push(...teeTimes);
@@ -54,6 +58,7 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
 
     if (combinedBody.length === 0) return { error: "No tee times found." };
 
+    // Step 3: Filter tee times
     const filterResponse = await fetch(`${CORS_PROXY}${BASE_URL}/filter_tee_times?code=${API_CODE}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -63,11 +68,13 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
 
     const filteredTeeTimes = await filterResponse.json();
     return filteredTeeTimes;
+
   } catch (error) {
     return { error: `Error: ${error.message}` };
   }
 }
 
+// ---- UI logic ----
 const els = {
   form: document.getElementById('search-form'),
   zip: document.getElementById('zipCode'),
@@ -121,19 +128,27 @@ function formatHours(h) {
 function setLoading(loading, message = '') {
   els.searchBtn.disabled = loading;
   els.status.classList.toggle('error', false);
+
   if (loading) {
-    els.status.innerText = message || 'Searching tee times...';
+    // Clear and add spinner + text
+    els.status.innerHTML = '';
+    const spinner = document.createElement('span');
+    spinner.className = 'spinner';
+    spinner.setAttribute('aria-hidden', 'true');
+    const text = document.createElement('span');
+    text.textContent = message || 'Searching tee times...';
+    els.status.appendChild(spinner);
+    els.status.appendChild(text);
+
     renderSkeletons();
-  } else if (message) {
-    els.status.innerText = message;
   } else {
-    els.status.innerText = '';
+    els.status.textContent = message || '';
   }
 }
 
 function showError(message) {
   els.status.classList.add('error');
-  els.status.innerText = message;
+  els.status.textContent = message;
 }
 
 function clearResults() {
@@ -149,6 +164,7 @@ function renderSkeletons(count = 6) {
   }
 }
 
+// Helper to get minimum tee time price per course
 function getMinTeeTimePrice(course) {
   if (!course || !Array.isArray(course.tee_times)) return null;
   const prices = course.tee_times
@@ -160,11 +176,13 @@ function getMinTeeTimePrice(course) {
 
 function renderResults(courses) {
   clearResults();
+
   if (!Array.isArray(courses) || courses.length === 0) {
     els.results.innerHTML = '<p class="meta">No tee times found for your criteria.</p>';
     return;
   }
 
+  // Sort by lowest tee-time price, then by number of tee times
   courses.sort((a, b) => {
     const minA = getMinTeeTimePrice(a);
     const minB = getMinTeeTimePrice(b);
@@ -216,7 +234,6 @@ function renderResults(courses) {
     card.appendChild(header);
     card.appendChild(meta);
     if (times.length) card.appendChild(chips);
-    // Removed separate "Book on Chronogolf" actions section per request.
     els.results.appendChild(card);
   }
 }
@@ -297,6 +314,7 @@ function escapeHtml(str) {
   }[s]));
 }
 
+// Init
 setDefaultValues();
 els.range.addEventListener('input', updateRangeOutput);
 els.form.addEventListener('submit', onSubmit);

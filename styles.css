@@ -138,6 +138,23 @@ output {
   min-height: 24px;
   color: var(--muted);
 }
+
+/* Spinner shown during search */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--chip-border);
+  border-top-color: var(--accent-2);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: -2px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 #status.error { color: var(--error); }
 
 .results-grid {
@@ -176,6 +193,7 @@ output {
   font-size: 0.9rem;
 }
 
+/* Chips (each tee time is a link) */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -183,8 +201,6 @@ output {
   align-items: flex-start;
   align-content: flex-start;
 }
-
-/* Anchor chips (tee time links) */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -227,6 +243,7 @@ output {
   100% { background-position: -200% 0; }
 }
 
+/* Mobile polish */
 @media (max-width: 480px) {
   .container { padding: 12px; }
   .results-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -236,5 +253,6 @@ output {
   .actions .btn { width: 100%; }
 }
 
+/* Prevent iOS auto-zoom on inputs */
 input, select, textarea, button { font-size: 16px; }
 html { -webkit-text-size-adjust: 100%; }
