@@ -8,10 +8,10 @@
   --error: #ff5a5f;
   --chip: #1a2440;
   --chip-border: #2a395e;
-  --switch-off-bg: #5c636f;
+  --switch-off-bg: #2a3954;
   --switch-on-bg: #2b8cff;
   --switch-knob: #ffffff;
-  --switch-knob-shadow: 0 2px 4px rgba(0,0,0,0.35);
+  --switch-knob-shadow: 0 2px 5px rgba(0,0,0,0.45);
 }
 
 *,
@@ -160,64 +160,79 @@ output {
 input, select, textarea, button { font-size:16px; }
 html { -webkit-text-size-adjust:100%; }
 
-/* Holes switch */
-.holes-field { position:relative; }
+/* Holes switch (updated) */
+.holes-field { position: relative; }
 .holes-switch {
-  width:72px;
-  height:32px;
-  position:relative;
-  cursor:pointer;
-  user-select:none;
-  display:inline-flex;
-  align-items:center;
+  width: 78px;
+  height: 34px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  outline: none;
 }
 .holes-track {
-  position:relative;
-  width:100%; height:100%;
-  background:var(--switch-off-bg);
-  border-radius:999px;
-  transition:background .25s;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);
-  font-size:.75rem;
-  font-weight:600;
-  letter-spacing:.5px;
-  color:#fff;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #2a3954 0%, #1f2d46 100%);
+  border-radius: 999px;
+  transition: background .25s;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: .4px;
+  color: #fff;
 }
-.holes-switch.on .holes-track { background:var(--switch-on-bg); }
-
+.holes-switch.on .holes-track {
+  background: linear-gradient(180deg, var(--switch-on-bg) 0%, #1f6fd1 100%);
+}
 .holes-label {
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  pointer-events:none;
-  opacity:.55;
-  transition:opacity .25s;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: color .25s, opacity .25s, text-shadow .25s;
+  opacity: .75;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
 }
-.holes-label-left { left:12px; }
-.holes-label-right { right:12px; }
-
+.holes-label-left { left: 12px; }
+.holes-label-right { right: 12px; }
 .holes-switch.on .holes-label-right,
 .holes-switch:not(.on) .holes-label-left {
-  opacity:1;
+  opacity: 1;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.35);
 }
-
+.holes-switch.on .holes-label-right::after,
+.holes-switch:not(.on) .holes-label-left::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: #ffffffcc;
+}
 .holes-knob {
-  position:absolute;
-  top:50%;
-  left:6px;
-  width:20px; height:20px;
-  background:var(--switch-knob);
-  border-radius:50%;
-  transform:translateY(-50%);
-  transition:left .25s, background .25s;
-  box-shadow:var(--switch-knob-shadow);
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 22px;
+  height: 22px;
+  background: var(--switch-knob);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: left .25s, box-shadow .25s;
+  box-shadow: var(--switch-knob-shadow), 0 0 0 1px rgba(255,255,255,0.25);
 }
-.holes-switch.on .holes-knob { left:46px; }
-
+.holes-switch.on .holes-knob { left: 50px; }
 .holes-switch:focus-visible .holes-track {
-  outline:2px solid var(--accent-2);
-  outline-offset:2px;
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
 }
-
-/* Optional subtle pressed effect */
-.holes-switch:active .holes-knob { width:22px; }
+.holes-switch:active .holes-knob { width: 23px; }
