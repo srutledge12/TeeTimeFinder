@@ -176,7 +176,6 @@ output {
   font-size: 0.9rem;
 }
 
-/* Keep chips sized to content and avoid vertical stretching on tall cards */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -184,6 +183,8 @@ output {
   align-items: flex-start;
   align-content: flex-start;
 }
+
+/* Anchor chips (tee time links) */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -197,14 +198,16 @@ output {
   line-height: 1;
   white-space: nowrap;
   flex: 0 0 auto;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+.chip:hover,
+.chip:focus {
+  background: #233358;
+  border-color: #375185;
+  outline: none;
 }
 
-.card-actions {
-  margin-top: 4px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
 .link {
   color: #9dc4ff;
   text-decoration: none;
@@ -224,19 +227,14 @@ output {
   100% { background-position: -200% 0; }
 }
 
-/* Mobile polish */
 @media (max-width: 480px) {
   .container { padding: 12px; }
-  .results-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  .results-grid { grid-template-columns: 1fr; gap: 12px; }
   .course-card { padding: 12px; }
   .chips { gap: 6px; }
   .chip { padding: 8px 10px; font-size: 0.95rem; }
   .actions .btn { width: 100%; }
 }
 
-/* Prevent iOS auto-zoom on inputs */
 input, select, textarea, button { font-size: 16px; }
 html { -webkit-text-size-adjust: 100%; }
