@@ -37,7 +37,7 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize) {
             page: page.toString()
           });
 
-          const response = await fetch(`${CORS_PROXY}${chronoUrl}?${params}`);
+            const response = await fetch(`${CORS_PROXY}${chronoUrl}?${params}`);
 
           if (response.ok) {
             const data = await response.json();
@@ -177,6 +177,16 @@ function renderSkeletons(count = 6) {
   }
 }
 
+// NEW: helper to get minimum tee time price per course
+function getMinTeeTimePrice(course) {
+  if (!course || !Array.isArray(course.tee_times)) return null;
+  const prices = course.tee_times
+    .map(tt => (tt && typeof tt.price === 'number') ? tt.price : null)
+    .filter(p => p !== null);
+  if (!prices.length) return null;
+  return Math.min(...prices);
+}
+
 function renderResults(courses) {
   clearResults();
 
@@ -185,11 +195,13 @@ function renderResults(courses) {
     return;
   }
 
-  // Sort by price ascending, then by number of tee times descending
+  // Sort: first by minimum tee time price, then by number of tee times descending
   courses.sort((a, b) => {
-    const pa = typeof a.price === 'number' ? a.price : Number.POSITIVE_INFINITY;
-    const pb = typeof b.price === 'number' ? b.price : Number.POSITIVE_INFINITY;
-    if (pa !== pb) return pa - pb;
+    const minA = getMinTeeTimePrice(a);
+    const minB = getMinTeeTimePrice(b);
+    const priceA = (typeof minA === 'number') ? minA : Number.POSITIVE_INFINITY;
+    const priceB = (typeof minB === 'number') ? minB : Number.POSITIVE_INFINITY;
+    if (priceA !== priceB) return priceA - priceB;
     return (b.tee_times?.length || 0) - (a.tee_times?.length || 0);
   });
 
@@ -204,16 +216,17 @@ function renderResults(courses) {
     name.className = 'course-name';
     name.textContent = course.course_name || 'Unnamed course';
 
-    const price = document.createElement('div');
-    price.className = 'price';
-    if (typeof course.price === 'number') {
-      price.textContent = `$${course.price}`;
+    const priceEl = document.createElement('div');
+    priceEl.className = 'price';
+    const minPrice = getMinTeeTimePrice(course);
+    if (typeof minPrice === 'number') {
+      priceEl.textContent = `From $${minPrice}`;
     } else {
-      price.textContent = '';
+      priceEl.textContent = '';
     }
 
     header.appendChild(name);
-    header.appendChild(price);
+    header.appendChild(priceEl);
 
     const meta = document.createElement('div');
     meta.className = 'meta';
@@ -224,9 +237,12 @@ function renderResults(courses) {
     chips.className = 'chips';
     const times = Array.isArray(course.tee_times) ? course.tee_times : [];
     for (const t of times) {
+      // t is now an object: { start_time, price }
       const chip = document.createElement('span');
       chip.className = 'chip';
-      chip.textContent = t;
+      const timeText = t?.start_time || '';
+      const priceText = (t && typeof t.price === 'number') ? ` - $${t.price}` : '';
+      chip.textContent = `${timeText}${priceText}`;
       chips.appendChild(chip);
     }
 
@@ -307,7 +323,6 @@ async function onSubmit(e) {
     if (result && !result.error) {
       renderResults(result);
       if (!Array.isArray(result)) {
-        // If backend returns object (unexpected), render it visibly.
         els.results.innerHTML = `<pre>${escapeHtml(JSON.stringify(result, null, 2))}</pre>`;
       }
     } else {

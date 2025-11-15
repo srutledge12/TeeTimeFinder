@@ -181,11 +181,11 @@ output {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: flex-start;    /* prevent tall ovals */
-  align-content: flex-start;  /* pack rows at the top */
+  align-items: flex-start;
+  align-content: flex-start;
 }
 .chip {
-  display: inline-flex;       /* center text inside pill */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--chip);
@@ -194,9 +194,9 @@ output {
   padding: 6px 9px;
   border-radius: 999px;
   font-size: 0.9rem;
-  line-height: 1;             /* remove baseline quirks */
-  white-space: nowrap;        /* keep time on one line */
-  flex: 0 0 auto;             /* never grow/shrink */
+  line-height: 1;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .card-actions {
