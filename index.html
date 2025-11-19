@@ -27,7 +27,6 @@
               placeholder="84106"
               required
             />
-            <small class="hint">5-digit US ZIP (required)</small>
           </div>
 
           <div class="field">
@@ -38,7 +37,6 @@
               type="date"
               required
             />
-            <small class="hint">Cannot be in the past</small>
           </div>
 
           <div class="field">
@@ -50,7 +48,6 @@
               step="60"
               required
             />
-            <small class="hint">e.g., 12:00 PM</small>
           </div>
 
           <div class="field">
@@ -66,10 +63,9 @@
               />
               <output id="timeRangeOutput" for="timeRange">±1 hr</output>
             </div>
-            <small class="hint">Search window around preferred time</small>
           </div>
 
-          <!-- Group size: switched to select for iOS wheel picker -->
+          <!-- Group size: native select (iOS wheel on iPhone) -->
           <div class="field">
             <label for="groupSize">Group size</label>
             <select id="groupSize" name="groupSize" required>
@@ -78,7 +74,6 @@
               <option value="3">3 players</option>
               <option value="4">4 players</option>
             </select>
-            <small class="hint">1–4 players</small>
           </div>
 
           <!-- Holes segmented control (two valid options, default 9) -->
@@ -91,7 +86,6 @@
               <input type="radio" id="holes18" name="holes" value="18">
               <label for="holes18">18</label>
             </div>
-            <small class="hint">Choose 9 or 18 holes</small>
           </div>
         </div>
 

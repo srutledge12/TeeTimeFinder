@@ -149,9 +149,7 @@ function showError(message) {
   els.status.textContent = message;
 }
 
-function clearResults() {
-  els.results.innerHTML = '';
-}
+function clearResults() { els.results.innerHTML = ''; }
 
 function renderSkeletons(count=6) {
   clearResults();
@@ -236,39 +234,15 @@ function renderResults(courses) {
 
 function validateForm() {
   const zipValid = /^[0-9]{5}$/.test(els.zip.value.trim());
-  if (!zipValid) {
-    els.zip.focus();
-    showError('Please enter a valid 5-digit US ZIP code.');
-    return false;
-  }
-  if (!els.date.value) {
-    els.date.focus();
-    showError('Please select a date.');
-    return false;
-  }
+  if (!zipValid) { els.zip.focus(); showError('Please enter a valid 5-digit US ZIP code.'); return false; }
+  if (!els.date.value) { els.date.focus(); showError('Please select a date.'); return false; }
   const todayStr = toInputDate(new Date());
-  if (els.date.value < todayStr) {
-    els.date.focus();
-    showError('Date cannot be in the past.');
-    return false;
-  }
-  if (!els.time.value) {
-    els.time.focus();
-    showError('Please choose a preferred time.');
-    return false;
-  }
+  if (els.date.value < todayStr) { els.date.focus(); showError('Date cannot be in the past.'); return false; }
+  if (!els.time.value) { els.time.focus(); showError('Please choose a preferred time.'); return false; }
   const range = parseFloat(els.range.value);
-  if (isNaN(range) || range < 0) {
-    els.range.focus();
-    showError('Flexibility window must be zero or more hours.');
-    return false;
-  }
+  if (isNaN(range) || range < 0) { els.range.focus(); showError('Flexibility window must be zero or more hours.'); return false; }
   const group = parseInt(els.group.value, 10);
-  if (isNaN(group) || group < 1 || group > 4) {
-    els.group.focus();
-    showError('Group size must be between 1 and 4.');
-    return false;
-  }
+  if (isNaN(group) || group < 1 || group > 4) { els.group.focus(); showError('Group size must be between 1 and 4.'); return false; }
   els.status.classList.remove('error');
   els.status.innerText = '';
   return true;

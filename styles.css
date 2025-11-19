@@ -50,6 +50,7 @@ html, body {
 @media (min-width:920px){ .field{ grid-column: span 2; } }
 label, .label { font-size: .92rem; }
 
+/* Inputs */
 input[type="text"],
 input[type="date"],
 input[type="time"],
@@ -64,15 +65,12 @@ select {
   color: var(--text);
   outline: none;
 }
-/* Optional: keep native select arrow; comment the next line out if you want the default arrow */
 select { -webkit-appearance: none; appearance: none; background-image: none; }
 
 input:focus, select:focus {
   border-color: var(--accent-2);
   box-shadow: 0 0 0 3px rgba(43,140,255,0.2);
 }
-
-.hint { color: var(--muted); font-size: .8rem; }
 
 .range-wrap { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
 output {
@@ -114,6 +112,7 @@ output {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Results grid and cards */
 .results-grid {
   margin-top: 18px;
   display: grid;
@@ -135,6 +134,7 @@ output {
 .price { color: var(--accent); font-weight: 700; }
 .meta { color: var(--muted); font-size: .9rem; }
 
+/* Tee time chips (each is a link) */
 .chips {
   display: flex; flex-wrap: wrap; gap: 8px;
   align-items: flex-start; align-content: flex-start;
@@ -153,6 +153,7 @@ output {
 .link { color: #9dc4ff; text-decoration: none; border-bottom: 1px dotted #335fa8; }
 .link:hover { color: #bcd7ff; }
 
+/* Skeleton loading cards */
 .skeleton {
   background: linear-gradient(90deg,#0f1832 25%,#0e1630 37%,#0f1832 63%);
   background-size: 400% 100%;
@@ -160,8 +161,52 @@ output {
   border-radius: 10px;
   height: 120px;
 }
-@keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes shine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
+/* Holes segmented control */
+.holes-field .segmented {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: #0e1630;
+  border: 1px solid #243457;
+  border-radius: 999px;
+  overflow: hidden;
+  user-select: none;
+}
+.holes-field .segmented input[type="radio"] {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden;
+}
+.holes-field .segmented label {
+  padding: 8px 16px;
+  text-align: center;
+  color: #cfe0ff;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  font-size: 0.95rem;
+  transition: color .2s, background .2s;
+}
+.holes-field .segmented input[type="radio"]:focus-visible + label {
+  outline: 2px solid var(--accent-2);
+  outline-offset: -2px;
+}
+.holes-field .segmented input[type="radio"]:checked + label {
+  background: linear-gradient(180deg, var(--switch-on-bg) 0%, #1f6fd1 100%);
+  color: #fff;
+}
+.holes-field .segmented label:first-of-type {
+  border-right: 1px solid #243457;
+}
+
+/* Mobile polish */
 @media (max-width:480px){
   .container{ padding:12px; }
   .results-grid{ grid-template-columns:1fr; gap:12px; }
@@ -173,49 +218,3 @@ output {
 
 input, select, textarea, button { font-size: 16px; }
 html { -webkit-text-size-adjust: 100%; }
-
-/* Segmented control for holes (two valid options) */
-.holes-field .segmented {
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: #0e1630;
-  border: 1px solid #243457;
-  border-radius: 999px;
-  overflow: hidden;
-  user-select: none;
-}
-
-.holes-field .segmented input[type="radio"] {
-  position: absolute !important;
-  opacity: 0 !important;
-  width: 1px; height: 1px;
-  margin: -1px; padding: 0; border: 0;
-  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden;
-}
-
-.holes-field .segmented label {
-  padding: 8px 16px;
-  text-align: center;
-  color: #cfe0ff;
-  cursor: pointer;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  font-size: 0.95rem;
-  transition: color .2s, background .2s;
-}
-
-.holes-field .segmented input[type="radio"]:focus-visible + label {
-  outline: 2px solid var(--accent-2);
-  outline-offset: -2px;
-}
-
-.holes-field .segmented input[type="radio"]:checked + label {
-  background: linear-gradient(180deg, var(--switch-on-bg) 0%, #1f6fd1 100%);
-  color: #fff;
-}
-
-/* Subtle divider between segments */
-.holes-field .segmented label:first-of-type {
-  border-right: 1px solid #243457;
-}
