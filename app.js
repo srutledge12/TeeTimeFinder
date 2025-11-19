@@ -1,18 +1,20 @@
 // Golf Tee Times Frontend
+
 const BASE_URL = "https://getcourseavailability.azurewebsites.net/api";
 const API_CODE = "r5KdTmvZoTt1gd7SiV6MYKKeCj8TIia8jU2F4oFud1NSAzFu0Y6jZw==";
 const CORS_PROXY = "https://corsproxy.io/?";
 
 async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize, holes) {
   try {
+    // Step 1: Get courses
     const coursesResponse = await fetch(`${BASE_URL}/get_courses?zip_code=${zipCode}&code=${API_CODE}`);
     if (!coursesResponse.ok) throw new Error(`Failed to fetch courses: ${coursesResponse.status}`);
 
     const courses = await coursesResponse.json();
     if (!courses || courses.length === 0) return { error: "No courses found." };
 
+    // Step 2: Fetch tee times per course
     const combinedBody = [];
-
     for (const course of courses) {
       try {
         const combinedCourseTeeTime = [];
@@ -59,6 +61,7 @@ async function getTeeTime(zipCode, date, preferredTime, timeRange, groupSize, ho
 
     if (combinedBody.length === 0) return { error: "No tee times found." };
 
+    // Step 3: Filter tee times on backend
     const filterResponse = await fetch(`${CORS_PROXY}${BASE_URL}/filter_tee_times?code=${API_CODE}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -82,9 +85,7 @@ const els = {
   group: document.getElementById('groupSize'),
   status: document.getElementById('status'),
   results: document.getElementById('results'),
-  searchBtn: document.getElementById('searchBtn'),
-  holesToggle: document.getElementById('holesToggle'),
-  holesHidden: document.getElementById('holes')
+  searchBtn: document.getElementById('searchBtn')
 };
 
 function setDefaultValues() {
@@ -92,14 +93,15 @@ function setDefaultValues() {
   const today = new Date();
   const minDate = toInputDate(today);
   els.date.min = minDate;
+
   const threeDays = new Date(today);
   threeDays.setDate(today.getDate() + 3);
   els.date.value = toInputDate(threeDays);
+
   els.time.value = '12:00';
   els.range.value = '1';
   updateRangeOutput();
   els.group.value = '4';
-  // holes default already set to 18 (switch ON)
 }
 
 function toInputDate(d) {
@@ -123,6 +125,7 @@ function formatHours(h) {
 function setLoading(loading, message='') {
   els.searchBtn.disabled = loading;
   els.status.classList.toggle('error', false);
+
   if (loading) {
     els.status.innerHTML = '';
     const spinner = document.createElement('span');
@@ -132,46 +135,53 @@ function setLoading(loading, message='') {
     text.textContent = message || 'Searching tee times...';
     els.status.appendChild(spinner);
     els.status.appendChild(text);
+
     renderSkeletons();
   } else {
     els.status.textContent = message || '';
   }
 }
 
-function showError(msg) {
+function showError(message) {
   els.status.classList.add('error');
-  els.status.textContent = msg;
+  els.status.textContent = message;
 }
 
-function clearResults() { els.results.innerHTML = ''; }
+function clearResults() {
+  els.results.innerHTML = '';
+}
 
 function renderSkeletons(count=6) {
   clearResults();
-  for (let i=0;i<count;i++) {
+  for (let i = 0; i < count; i++) {
     const sk = document.createElement('div');
-    sk.className='skeleton';
+    sk.className = 'skeleton';
     els.results.appendChild(sk);
   }
 }
 
 function getMinTeeTimePrice(course) {
   if (!course || !Array.isArray(course.tee_times)) return null;
-  const prices = course.tee_times.map(tt => (tt && typeof tt.price === 'number') ? tt.price : null).filter(p => p !== null);
+  const prices = course.tee_times
+    .map(tt => (tt && typeof tt.price === 'number') ? tt.price : null)
+    .filter(p => p !== null);
   return prices.length ? Math.min(...prices) : null;
 }
 
 function renderResults(courses) {
   clearResults();
+
   if (!Array.isArray(courses) || courses.length === 0) {
     els.results.innerHTML = '<p class="meta">No tee times found for your criteria.</p>';
     return;
   }
 
-  courses.sort((a,b) => {
+  // Sort by lowest tee-time price, then count
+  courses.sort((a, b) => {
     const minA = getMinTeeTimePrice(a);
     const minB = getMinTeeTimePrice(b);
-    const priceA = (typeof minA === 'number') ? minA : Infinity;
-    const priceB = (typeof minB === 'number') ? minB : Infinity;
+    const priceA = (typeof minA === 'number') ? minA : Number.POSITIVE_INFINITY;
+    const priceB = (typeof minB === 'number') ? minB : Number.POSITIVE_INFINITY;
     if (priceA !== priceB) return priceA - priceB;
     return (b.tee_times?.length || 0) - (a.tee_times?.length || 0);
   });
@@ -224,15 +234,39 @@ function renderResults(courses) {
 
 function validateForm() {
   const zipValid = /^[0-9]{5}$/.test(els.zip.value.trim());
-  if (!zipValid) { els.zip.focus(); showError('Please enter a valid 5-digit US ZIP code.'); return false; }
-  if (!els.date.value) { els.date.focus(); showError('Please select a date.'); return false; }
+  if (!zipValid) {
+    els.zip.focus();
+    showError('Please enter a valid 5-digit US ZIP code.');
+    return false;
+  }
+  if (!els.date.value) {
+    els.date.focus();
+    showError('Please select a date.');
+    return false;
+  }
   const todayStr = toInputDate(new Date());
-  if (els.date.value < todayStr) { els.date.focus(); showError('Date cannot be in the past.'); return false; }
-  if (!els.time.value) { els.time.focus(); showError('Please choose a preferred time.'); return false; }
+  if (els.date.value < todayStr) {
+    els.date.focus();
+    showError('Date cannot be in the past.');
+    return false;
+  }
+  if (!els.time.value) {
+    els.time.focus();
+    showError('Please choose a preferred time.');
+    return false;
+  }
   const range = parseFloat(els.range.value);
-  if (isNaN(range) || range < 0) { els.range.focus(); showError('Flexibility window must be zero or more hours.'); return false; }
+  if (isNaN(range) || range < 0) {
+    els.range.focus();
+    showError('Flexibility window must be zero or more hours.');
+    return false;
+  }
   const group = parseInt(els.group.value, 10);
-  if (isNaN(group) || group < 1 || group > 4) { els.group.focus(); showError('Group size must be between 1 and 4.'); return false; }
+  if (isNaN(group) || group < 1 || group > 4) {
+    els.group.focus();
+    showError('Group size must be between 1 and 4.');
+    return false;
+  }
   els.status.classList.remove('error');
   els.status.innerText = '';
   return true;
@@ -247,7 +281,10 @@ async function onSubmit(e) {
   const preferredTime = els.time.value;
   const timeRange = parseFloat(els.range.value);
   const groupSize = parseInt(els.group.value, 10);
-  const holes = parseInt(els.holesHidden.value, 10);
+
+  // Read holes from the segmented control (radios)
+  const holesEl = document.querySelector('input[name="holes"]:checked');
+  const holes = holesEl ? parseInt(holesEl.value, 10) : undefined;
 
   setLoading(true, 'Searching tee times...');
   try {
@@ -256,6 +293,7 @@ async function onSubmit(e) {
     if (result && !result.error) {
       renderResults(result);
       if (!Array.isArray(result)) {
+        // fallback: show raw
         els.results.innerHTML = `<pre>${escapeHtml(JSON.stringify(result, null, 2))}</pre>`;
       }
     } else {
@@ -271,42 +309,11 @@ async function onSubmit(e) {
 
 function escapeHtml(str) {
   return str.replace(/[&<>"']/g, s => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[s]));
 }
 
-/* Holes toggle logic */
-function initHolesToggle() {
-  const toggle = els.holesToggle;
-  const hidden = els.holesHidden;
-
-  function updateVisual() {
-    const val = hidden.value === '18';
-    toggle.setAttribute('aria-checked', String(val));
-    toggle.dataset.value = hidden.value;
-    toggle.classList.toggle('on', val);
-  }
-
-  function flip() {
-    hidden.value = hidden.value === '18' ? '9' : '18';
-    updateVisual();
-  }
-
-  toggle.addEventListener('click', () => {
-    flip();
-  });
-
-  toggle.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      flip();
-    }
-  });
-
-  updateVisual();
-}
-
+// Init
 setDefaultValues();
-initHolesToggle();
 els.range.addEventListener('input', updateRangeOutput);
 els.form.addEventListener('submit', onSubmit);

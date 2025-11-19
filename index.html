@@ -69,40 +69,31 @@
             <small class="hint">Search window around preferred time</small>
           </div>
 
-            <div class="field">
-              <label for="groupSize">Group size</label>
-              <input
-                id="groupSize"
-                name="groupSize"
-                type="number"
-                min="1"
-                max="4"
-                step="1"
-                required
-              />
-              <small class="hint">1–4 players</small>
-            </div>
+          <div class="field">
+            <label for="groupSize">Group size</label>
+            <input
+              id="groupSize"
+              name="groupSize"
+              type="number"
+              min="1"
+              max="4"
+              step="1"
+              required
+            />
+            <small class="hint">1–4 players</small>
+          </div>
 
-          <!-- New holes toggle -->
+          <!-- Holes segmented control (two valid options, default 9) -->
           <div class="field holes-field">
-            <label class="label" for="holesToggle">Holes</label>
-            <div
-              id="holesToggle"
-              class="holes-switch"
-              role="switch"
-              aria-checked="true"
-              tabindex="0"
-              aria-label="Toggle between 9 and 18 holes"
-              data-value="18"
-            >
-              <div class="holes-track">
-                <span class="holes-label holes-label-left">9</span>
-                <span class="holes-label holes-label-right">18</span>
-                <span class="holes-knob"></span>
-              </div>
+            <span class="label">Holes</span>
+            <div class="segmented" role="radiogroup" aria-label="Holes">
+              <input type="radio" id="holes9" name="holes" value="9" checked>
+              <label for="holes9">9</label>
+
+              <input type="radio" id="holes18" name="holes" value="18">
+              <label for="holes18">18</label>
             </div>
-            <input type="hidden" id="holes" name="holes" value="18" />
-            <small class="hint">Toggle: 9 or 18 holes</small>
+            <small class="hint">Choose 9 or 18 holes</small>
           </div>
         </div>
 
