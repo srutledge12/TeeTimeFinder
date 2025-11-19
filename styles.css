@@ -54,7 +54,8 @@ input[type="text"],
 input[type="date"],
 input[type="time"],
 input[type="number"],
-input[type="range"] {
+input[type="range"],
+select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
@@ -63,7 +64,14 @@ input[type="range"] {
   color: var(--text);
   outline: none;
 }
-input:focus { border-color: var(--accent-2); box-shadow: 0 0 0 3px rgba(43,140,255,0.2); }
+/* Optional: keep native select arrow; comment the next line out if you want the default arrow */
+select { -webkit-appearance: none; appearance: none; background-image: none; }
+
+input:focus, select:focus {
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 3px rgba(43,140,255,0.2);
+}
+
 .hint { color: var(--muted); font-size: .8rem; }
 
 .range-wrap { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
@@ -179,7 +187,6 @@ html { -webkit-text-size-adjust: 100%; }
 }
 
 .holes-field .segmented input[type="radio"] {
-  /* Visually hidden but accessible */
   position: absolute !important;
   opacity: 0 !important;
   width: 1px; height: 1px;
@@ -194,7 +201,7 @@ html { -webkit-text-size-adjust: 100%; }
   cursor: pointer;
   font-weight: 700;
   letter-spacing: 0.2px;
-  font-size: 0.95rem; /* bigger */
+  font-size: 0.95rem;
   transition: color .2s, background .2s;
 }
 

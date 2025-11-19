@@ -69,17 +69,15 @@
             <small class="hint">Search window around preferred time</small>
           </div>
 
+          <!-- Group size: switched to select for iOS wheel picker -->
           <div class="field">
             <label for="groupSize">Group size</label>
-            <input
-              id="groupSize"
-              name="groupSize"
-              type="number"
-              min="1"
-              max="4"
-              step="1"
-              required
-            />
+            <select id="groupSize" name="groupSize" required>
+              <option value="1">1 player</option>
+              <option value="2">2 players</option>
+              <option value="3">3 players</option>
+              <option value="4">4 players</option>
+            </select>
             <small class="hint">1–4 players</small>
           </div>
 

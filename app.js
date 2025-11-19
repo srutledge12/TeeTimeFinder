@@ -101,6 +101,8 @@ function setDefaultValues() {
   els.time.value = '12:00';
   els.range.value = '1';
   updateRangeOutput();
+
+  // Default group size
   els.group.value = '4';
 }
 
@@ -282,7 +284,7 @@ async function onSubmit(e) {
   const timeRange = parseFloat(els.range.value);
   const groupSize = parseInt(els.group.value, 10);
 
-  // Read holes from the segmented control (radios)
+  // Read holes from segmented control radios
   const holesEl = document.querySelector('input[name="holes"]:checked');
   const holes = holesEl ? parseInt(holesEl.value, 10) : undefined;
 
@@ -293,7 +295,6 @@ async function onSubmit(e) {
     if (result && !result.error) {
       renderResults(result);
       if (!Array.isArray(result)) {
-        // fallback: show raw
         els.results.innerHTML = `<pre>${escapeHtml(JSON.stringify(result, null, 2))}</pre>`;
       }
     } else {
